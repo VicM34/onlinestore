@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты - Интернет-магазин</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .contact-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            height: 100%;
+        }
+        .form-card {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">🛒 OnlineStore</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/contacts/">Контакты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/">Админка</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h1 class="mb-4">Контакты</h1>
+
+        {% if success_message %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ success_message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endif %}
+
+        <div class="row mb-5">
+            <div class="col-md-6 mb-4">
+                <div class="contact-card">
+                    <h3 class="mb-4">Наши контакты</h3>
+                    <p><strong>Адрес:</strong> г. Волгоград, ул. Советская, д. 123</p>
+                    <p><strong>Телефон:</strong> +7 (999) 123-45-67</p>
+                    <p><strong>Email:</strong> info@onlinestore.ru</p>
+                    <p><strong>Время работы:</strong> Пн-Пт: 9:00-20:00</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="form-card">
+                    <h3 class="mb-4">Обратная связь</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Имя *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Сообщение *</label>
+                            <textarea class="form-control" name="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Отправить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>OnlineStore</h5>
+                    <p>Лучший интернет-магазин с 2026 года</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Контакты</h5>
+                    <p>Email: info@onlinestore.ru</p>
+                    <p>Телефон: +7 (999) 123-45-67</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Мы в соцсетях</h5>
+                    <div>
+                        <a href="#" class="text-decoration-none me-3">Facebook</a>
+                        <a href="#" class="text-decoration-none me-3">Instagram</a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <p class="text-center">&copy; 2026 OnlineStore. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

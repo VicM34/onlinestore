@@ -1,0 +1,115 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+*.pyd
+*.pyo
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+.env/
+env.bak/
+venv.bak/
+pythonenv*
+myenv/
+.venv*/
+venv*/
+env*/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-*
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+.idea_modules/
+
+# Database
+*.sqlite3
+*.db
+db.sqlite3
+*.sqlite
+*.db-journal
+
+# Django
+*.log
+staticfiles/
+media/
+*.pot
+migrations/__pycache__/
+
+# Django coverage reports
+htmlcov/
+.coverage
+.coverage.*
+*.cover
+
+# PyTest
+.pytest_cache/
+.mypy_cache/
+.tox/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+*.whl
+
+# OS
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
+*.lnk
+
+# Temp
+temp/
+tmp/
+*.tmp
+*.temp
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node.js (если будете использовать)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker (для будущего)
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
