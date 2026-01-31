@@ -1,8 +1,8 @@
-from pathlib import Path
+﻿from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-# Загружаем переменные окружения из .env файла
+# Р—Р°РіСЂСѓР¶Р°РµРј РїРµСЂРµРјРµРЅРЅС‹Рµ РѕРєСЂСѓР¶РµРЅРёСЏ РёР· .env С„Р°Р№Р»Р°
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,7 +48,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -110,12 +110,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Дополнительные директории со статическими файлами
+# Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РґРёСЂРµРєС‚РѕСЂРёРё СЃРѕ СЃС‚Р°С‚РёС‡РµСЃРєРёРјРё С„Р°Р№Р»Р°РјРё
 STATICFILES_DIRS = [
-    BASE_DIR / 'catalog/static',
+    
 ]
 
-# Медиа файлы (если нужно загружать изображения)
+# РњРµРґРёР° С„Р°Р№Р»С‹ (РµСЃР»Рё РЅСѓР¶РЅРѕ Р·Р°РіСЂСѓР¶Р°С‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ)
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -123,3 +123,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
