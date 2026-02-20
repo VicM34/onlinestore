@@ -1,106 +1,103 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная - Интернет-магазин</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 100px 0;
-        }
-        .card {
-            transition: transform 0.3s;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/">🛒 OnlineStore</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/">Главная</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contacts/">Контакты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/">Админка</a>
-                    </li>
-                </ul>
+{% extends "catalog/base.html" %}
+
+{% block title %}Главная - Интернет-магазин{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 100px 0;
+    }
+    .card {
+        transition: transform 0.3s;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .product-card {
+        height: 100%;
+    }
+    .product-card .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+    .product-card .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+    .product-card .btn-primary:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Добро пожаловать в наш интернет-магазин!</h1>
+        <p class="lead">Лучшие товары по самым выгодным ценам</p>
+        <a href="#products" class="btn btn-light btn-lg mt-3">Начать покупки</a>
+    </div>
+</section>
+
+<!-- Секция преимуществ -->
+<div class="container my-5">
+    <h2 class="text-center mb-5">Наши преимущества</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center p-4">
+                <h3>🚚 Быстрая доставка</h3>
+                <p>Доставка по всей России за 1-3 дня</p>
             </div>
         </div>
-    </nav>
-
-    <section class="hero text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bold">Добро пожаловать в наш интернет-магазин!</h1>
-            <p class="lead">Лучшие товары по самым выгодным ценам</p>
-            <a href="#" class="btn btn-light btn-lg mt-3">Начать покупки</a>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center p-4">
+                <h3>💯 Гарантия качества</h3>
+                <p>Все товары проходят проверку</p>
+            </div>
         </div>
-    </section>
-
-    <div class="container my-5">
-        <h2 class="text-center mb-5">Наши преимущества</h2>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 text-center p-4">
-                    <h3>🚚 Быстрая доставка</h3>
-                    <p>Доставка по всей России за 1-3 дня</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 text-center p-4">
-                    <h3>💯 Гарантия качества</h3>
-                    <p>Все товары проходят проверку согласно требованиям РОСПОТРЕБНАДЗОР</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 text-center p-4">
-                    <h3>🔒 Безопасная оплата</h3>
-                    <p>Оплата картой или наличными</p>
-                </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center p-4">
+                <h3>🔒 Безопасная оплата</h3>
+                <p>Оплата картой или наличными</p>
             </div>
         </div>
     </div>
+</div>
 
-    <footer class="bg-light py-5 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>OnlineStore</h5>
-                    <p>Лучший интернет-магазин с 2026 года</p>
+<!-- Секция товаров -->
+<div class="container my-5" id="products">
+    <h2 class="text-center mb-5">Наши товары</h2>
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4 mb-4">
+            <div class="card product-card">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <span class="text-white">Нет изображения</span>
                 </div>
-                <div class="col-md-4">
-                    <h5>Контакты</h5>
-                    <p>Email: info@onlinestore.ru</p>
-                    <p>Телефон: +7 (999) 123-45-67</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Быстрые ссылки</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/" class="text-decoration-none">Главная</a></li>
-                        <li><a href="/contacts/" class="text-decoration-none">Контакты</a></li>
-                    </ul>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                    <p class="card-text"><strong>Цена:</strong> {{ product.price }} руб.</p>
+                    <p class="card-text"><small class="text-muted">Категория: {{ product.category.name }}</small></p>
+                    <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-primary w-100">Подробнее</a>
                 </div>
             </div>
-            <hr class="my-4">
-            <p class="text-center">&copy; 2026 OnlineStore. Все права защищены.</p>
         </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                Товаров пока нет. <a href="/admin/">Добавьте товары</a> через админку.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
