@@ -6,7 +6,7 @@ def home(request):
     """Контроллер для главной страницы"""
     # Получаем все товары из базы данных, сортируем по дате создания (новые сверху)
     products = Product.objects.all().order_by('-created_at')
-
+    
     # Для допзадания: вывод в консоль последних 5 продуктов
     latest_products = products[:5]
     print("Последние 5 продуктов:")
@@ -14,7 +14,7 @@ def home(request):
         print(f"  - {product.name} ({product.created_at})")
 
     context = {
-        'products': products,  # Передаем товары в шаблон
+        'products': products,  # Передаем все товары в шаблон
         'latest_products': latest_products,  # Для допзадания
     }
     return render(request, 'catalog/home.html', context)
