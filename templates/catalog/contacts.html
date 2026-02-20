@@ -62,5 +62,35 @@
             </div>
         </div>
     </div>
+
+    {% if contacts %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>Последние сообщения:</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Сообщение</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                        <tr>
+                            <td>{{ contact.name }}</td>
+                            <td>{{ contact.email }}</td>
+                            <td>{{ contact.message|truncatechars:50 }}</td>
+                            <td>{{ contact.created_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
