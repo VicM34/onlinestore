@@ -43,6 +43,7 @@ python manage.py runserver
 ### ⚙️ Админ-панель: http://127.0.0.1:8000/admin/
 
 ## 🛠 Технологии
+
 ### Основные зависимости
 ```
 Django 5.2.10 - веб-фреймворк
@@ -74,6 +75,18 @@ Bootstrap 5.3 - CSS-фреймворк (через CDN)
 
 ## Администрирование
 ### ⚙️ Панель администратора Django
+
+### Настройка базы данных PostgreSQL
+
+#### 1. Создайте базу данных в PostgreSQL
+#### 2. Скопируйте файл окружения
+cp .env.example .env
+#### 3. Отредактируйте .env файл, указав данные PostgreSQL:
+#### DATABASE_NAME=your_database_name
+#### DATABASE_USER=your_username
+#### DATABASE_PASSWORD=your_password
+#### DATABASE_HOST=localhost
+#### ATABASE_PORT=5432
 
 ## 👤 Управление пользователями
 ```
