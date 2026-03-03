@@ -1,0 +1,43 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}{{ post.title }} - Блог{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}">Блог</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+        </ol>
+    </nav>
+    
+    <article class="blog-post">
+        <h1 class="mb-4">{{ post.title }}</h1>
+        
+        <div class="text-muted mb-4">
+            <span>Опубликовано: {{ post.created_at|date:"d.m.Y H:i" }}</span>
+            <span class="mx-3">|</span>
+            <span>Просмотров: {{ post.views_count }}</span>
+        </div>
+        
+        {% if post.preview %}
+        <div class="mb-4">
+            <img src="{{ post.preview.url }}" class="img-fluid rounded" alt="{{ post.title }}">
+        </div>
+        {% endif %}
+        
+        <div class="blog-content">
+            {{ post.content|linebreaks }}
+        </div>
+        
+        <div class="mt-5">
+            <a href="{% url 'blog:post_list' %}" class="btn btn-secondary">Вернуться к списку</a>
+            
+            {% if user.is_authenticated %}
+            <a href="{% url 'blog:post_update' post.pk %}" class="btn btn-warning">Редактировать</a>
+            <a href="{% url 'blog:post_delete' post.pk %}" class="btn btn-danger">Удалить</a>
+            {% endif %}
+        </div>
+    </article>
+</div>
+{% endblock %}
