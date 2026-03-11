@@ -31,13 +31,28 @@
     .product-card .btn-primary:hover {
         background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     }
+    .product-card .btn-warning, .product-card .btn-danger {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    .admin-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+        display: flex;
+        gap: 5px;
+    }
+    .product-card {
+        position: relative;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <section class="hero text-center">
     <div class="container">
-        <h1 class="display-4 fw-bold">Добро пожаловать в наш интернет-магазин!</h1>
+        <h1 class="display-7 fw-bold">Добро пожаловать в наш интернет-магазин!</h1>
         <p class="lead">Лучшие товары по самым выгодным ценам</p>
         <a href="#products" class="btn btn-light btn-lg mt-3">Начать покупки</a>
     </div>
@@ -49,19 +64,19 @@
     <div class="row">
         <div class="col-md-4 mb-4">
             <div class="card h-100 text-center p-4">
-                <h3>🚚 Быстрая доставка</h3>
+                <h3><i class="bi bi-truck"></i> Быстрая доставка</h3>
                 <p>Доставка по всей России за 1-3 дня</p>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100 text-center p-4">
-                <h3>💯 Гарантия качества</h3>
+                <h3><i class="bi bi-shield-check"></i> Гарантия качества</h3>
                 <p>Все товары проходят проверку</p>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100 text-center p-4">
-                <h3>🔒 Безопасная оплата</h3>
+                <h3><i class="bi bi-lock"></i> Безопасная оплата</h3>
                 <p>Оплата картой или наличными</p>
             </div>
         </div>
@@ -70,31 +85,66 @@
 
 <!-- Секция товаров -->
 <div class="container my-5" id="products">
-    <h2 class="text-center mb-5">Наши товары</h2>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h2 class="mb-0">Наши товары</h2>
+        {% if user.is_authenticated %}
+        <a href="{% url 'catalog:product_create' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Добавить новый товар
+        </a>
+        {% endif %}
+    </div>
+
     <div class="row">
         {% for product in products %}
         <div class="col-md-4 mb-4">
             <div class="card product-card">
+                {% if user.is_authenticated %}
+                <div class="admin-actions">
+                    <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning btn-sm" title="Редактировать">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger btn-sm" title="Удалить">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+                {% endif %}
+
                 {% if product.image %}
                 <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                 {% else %}
                 <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
-                    <span class="text-white">Нет изображения</span>
+                    <span class="text-white"><i class="bi bi-image"></i> Нет изображения</span>
                 </div>
                 {% endif %}
+
                 <div class="card-body">
                     <h5 class="card-title">{{ product.name }}</h5>
                     <p class="card-text">{{ product.description|truncatechars:100 }}</p>
-                    <p class="card-text"><strong>Цена:</strong> {{ product.price }} руб.</p>
-                    <p class="card-text"><small class="text-muted">Категория: {{ product.category.name }}</small></p>
-                    <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-primary w-100">Подробнее</a>
+                    <p class="card-text">
+                        <strong>Цена:</strong>
+                        <span class="text-primary fs-5">{{ product.price }} руб.</span>
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="bi bi-tag"></i> {{ product.category.name }}
+                        </small>
+                    </p>
+                    <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-primary w-100">
+                        <i class="bi bi-eye"></i> Подробнее
+                    </a>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12">
             <div class="alert alert-info text-center">
-                Товаров пока нет. <a href="/admin/">Добавьте товары</a> через админку.
+                <i class="bi bi-info-circle"></i>
+                Товаров пока нет.
+                {% if user.is_authenticated %}
+                <a href="{% url 'catalog:product_create' %}" class="alert-link">Добавьте первый товар</a>!
+                {% else %}
+                <a href="/admin/" class="alert-link">Войдите в админку</a> чтобы добавить товары.
+                {% endif %}
             </div>
         </div>
         {% endfor %}
