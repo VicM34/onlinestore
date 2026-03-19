@@ -1,4 +1,5 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -7,23 +8,15 @@ from .forms import ProductForm
 
 
 class HomeListView(ListView):
-    """Главная страница со списком товаров"""
+    """Главная страница со списком товаров (доступна всем)"""
     model = Product
     template_name = 'catalog/home.html'
     context_object_name = 'products'
     ordering = ['-created_at']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['latest_products'] = Product.objects.all().order_by('-created_at')[:5]
-        return context
-
-    def render_to_response(self, context, **response_kwargs):
-        latest_products = context.get('latest_products', [])
-        print("Последние 5 продуктов:")
-        for product in latest_products:
-            print(f"  - {product.name} ({product.created_at})")
-        return super().render_to_response(context, **response_kwargs)
+    def get_queryset(self):
+        # Показываем только опубликованные товары для всех
+        return Product.objects.filter(is_published=True).order_by('-created_at')
 
 
 class ProductDetailView(DetailView):
@@ -33,42 +26,57 @@ class ProductDetailView(DetailView):
     context_object_name = 'product'
 
 
-class ProductCreateView(CreateView):
-    """Создание нового продукта"""
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    """Создание продукта (только для авторизованных)"""
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('catalog:home')
+    login_url = 'users:login'
 
     def form_valid(self, form):
+        # Автоматически назначаем владельца
+        form.instance.owner = self.request.user
         messages.success(self.request, 'Продукт успешно создан!')
         return super().form_valid(form)
 
-    def form_invalid(self, form):
-        messages.error(self.request, 'Пожалуйста, исправьте ошибки в форме.')
-        return super().form_invalid(form)
 
-
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Редактирование продукта"""
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
+    login_url = 'users:login'
+    raise_exception = True
+
+    def test_func(self):
+        """Проверка прав на редактирование"""
+        product = self.get_object()
+        user = self.request.user
+
+        # Редактировать может владелец или модератор (с правом can_unpublish_product)
+        return user == product.owner or user.has_perm('catalog.can_unpublish_product')
 
     def get_success_url(self):
         messages.success(self.request, 'Продукт успешно обновлен!')
         return reverse_lazy('catalog:product_detail', kwargs={'pk': self.object.pk})
 
-    def form_invalid(self, form):
-        messages.error(self.request, 'Пожалуйста, исправьте ошибки в форме.')
-        return super().form_invalid(form)
 
-
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Удаление продукта"""
     model = Product
     template_name = 'catalog/product_confirm_delete.html'
     success_url = reverse_lazy('catalog:home')
+    login_url = 'users:login'
+    raise_exception = True
+
+    def test_func(self):
+        """Проверка прав на удаление"""
+        product = self.get_object()
+        user = self.request.user
+
+        # Удалять может владелец или модератор (с правом can_delete_any_product)
+        return user == product.owner or user.has_perm('catalog.can_delete_any_product')
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, 'Продукт успешно удален!')
@@ -76,7 +84,7 @@ class ProductDeleteView(DeleteView):
 
 
 class ContactsView(TemplateView):
-    """Страница контактов"""
+    """Страница контактов (доступна всем)"""
     template_name = 'catalog/contacts.html'
 
     def post(self, request, *args, **kwargs):
