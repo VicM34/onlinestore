@@ -19,6 +19,7 @@
     }
     .product-card {
         height: 100%;
+        position: relative;
     }
     .product-card .card-img-top {
         height: 200px;
@@ -43,8 +44,16 @@
         display: flex;
         gap: 5px;
     }
-    .product-card {
-        position: relative;
+    .unpublished-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+    }
+    .owner-info {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
     }
 </style>
 {% endblock %}
@@ -98,17 +107,32 @@
         {% for product in products %}
         <div class="col-md-4 mb-4">
             <div class="card product-card">
-                {% if user.is_authenticated %}
-                <div class="admin-actions">
-                    <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning btn-sm" title="Редактировать">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-                    <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger btn-sm" title="Удалить">
-                        <i class="bi bi-trash"></i>
-                    </a>
+                <!-- Бейдж неопубликованного товара -->
+                {% if not product.is_published %}
+                <div class="unpublished-badge">
+                    <span class="badge bg-warning text-dark">Не опубликовано</span>
                 </div>
                 {% endif %}
 
+                <!-- Кнопки управления для владельца и модератора -->
+                {% if user.is_authenticated %}
+                    {% if user == product.owner or perms.catalog.can_unpublish_product %}
+                    <div class="admin-actions">
+                        {% if user == product.owner or perms.catalog.can_unpublish_product %}
+                        <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning btn-sm" title="Редактировать">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        {% endif %}
+                        {% if user == product.owner or perms.catalog.can_delete_any_product %}
+                        <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger btn-sm" title="Удалить">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Изображение товара -->
                 {% if product.image %}
                 <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                 {% else %}
@@ -117,6 +141,7 @@
                 </div>
                 {% endif %}
 
+                <!-- Информация о товаре -->
                 <div class="card-body">
                     <h5 class="card-title">{{ product.name }}</h5>
                     <p class="card-text">{{ product.description|truncatechars:100 }}</p>
@@ -129,7 +154,17 @@
                             <i class="bi bi-tag"></i> {{ product.category.name }}
                         </small>
                     </p>
-                    <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-primary w-100">
+
+                    <!-- Информация о владельце -->
+                    {% if product.owner %}
+                    <div class="owner-info">
+                        <small>
+                            <i class="bi bi-person"></i> Владелец: {{ product.owner.email }}
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-primary w-100 mt-2">
                         <i class="bi bi-eye"></i> Подробнее
                     </a>
                 </div>
@@ -143,7 +178,7 @@
                 {% if user.is_authenticated %}
                 <a href="{% url 'catalog:product_create' %}" class="alert-link">Добавьте первый товар</a>!
                 {% else %}
-                <a href="/admin/" class="alert-link">Войдите в админку</a> чтобы добавить товары.
+                <a href="{% url 'users:login' %}" class="alert-link">Войдите</a> чтобы добавить товары.
                 {% endif %}
             </div>
         </div>

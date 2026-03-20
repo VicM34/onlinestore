@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Category(models.Model):
@@ -43,7 +44,7 @@ class Product(models.Model):
         null=True
     )
     category = models.ForeignKey(
-        Category,
+        Category,  # Используем класс, а не строку
         on_delete=models.CASCADE,
         verbose_name='Категория',
         related_name='products'
@@ -62,10 +63,29 @@ class Product(models.Model):
         verbose_name='Дата последнего изменения'
     )
 
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name='Опубликовано'
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        verbose_name='Владелец',
+        null=True,
+        blank=True,
+        related_name='products'
+    )
+
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
         ordering = ['-created_at']
+
+        # Кастомные права
+        permissions = [
+            ("can_unpublish_product", "Может отменять публикацию продукта"),
+            ("can_delete_any_product", "Может удалять любой продукт"),
+        ]
 
     def __str__(self):
         return f'{self.name} - {self.price} руб.'

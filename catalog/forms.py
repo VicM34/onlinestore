@@ -29,45 +29,50 @@ class ProductForm(forms.ModelForm):
             'price': 'Цена (руб.)',
         }
         widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Введите название продукта'
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Введите описание',
-                'rows': 4
-            }),
-            'image': forms.FileInput(attrs={
-                'class': 'form-control'
-            }),
-            'category': forms.Select(attrs={
-                'class': 'form-select'
-            }),
-            'price': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': '0.00',
-                'step': '0.01'
-            }),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название продукта'}),
+            'description': forms.Textarea(
+                attrs={'class': 'form-control', 'placeholder': 'Введите описание', 'rows': 4}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'}),
         }
         help_texts = {
             'price': 'Цена должна быть положительным числом',
         }
 
     def __init__(self, *args, **kwargs):
-        """Добавляем стилизацию Bootstrap ко всем полям"""
         super().__init__(*args, **kwargs)
 
-        for field_name, field in self.fields.items():
-            # Добавляем класс form-control
-            if field.widget.attrs.get('class'):
-                field.widget.attrs['class'] += ' form-control'
-            else:
-                field.widget.attrs['class'] = 'form-control'
+        # Проверяем, существует ли поле is_published в модели
+        try:
+            # Пробуем получить поле из модели
+            self._meta.model._meta.get_field('is_published')
 
-            # Добавляем placeholder для полей, где его нет
-            if not field.widget.attrs.get('placeholder') and field_name != 'category':
-                field.widget.attrs['placeholder'] = f'Введите {field.label.lower()}'
+            # Если поле существует, добавляем его в форму
+            self.fields['is_published'] = forms.BooleanField(
+                required=False,
+                label='Опубликовано',
+                widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+            )
+            # Добавляем в fields, если его там нет
+            if 'is_published' not in self._meta.fields:
+                self._meta.fields.append('is_published')
+        except:
+            # Поле еще не существует в модели - пропускаем
+            pass
+
+        # Стилизация всех полей
+        for field_name, field in self.fields.items():
+            if field_name == 'is_published':
+                field.widget.attrs['class'] = 'form-check-input'
+            else:
+                if field.widget.attrs.get('class'):
+                    field.widget.attrs['class'] += ' form-control'
+                else:
+                    field.widget.attrs['class'] = 'form-control'
+
+                if not field.widget.attrs.get('placeholder') and field_name != 'category':
+                    field.widget.attrs['placeholder'] = f'Введите {field.label.lower()}'
 
     def clean_name(self):
         """Валидация названия продукта на запрещенные слова"""

@@ -67,3 +67,63 @@
     </div>
 </div>
 {% endblock %}
+
+<div class="col-md-6">
+    <div class="product-info">
+        <h1 class="mb-4">{{ product.name }}</h1>
+        {% if not product.is_published %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> Этот товар не опубликован
+        </div>
+        {% endif %}
+
+        <p class="lead">{{ product.description }}</p>
+
+        <table class="table table-borderless">
+            <tr>
+                <th>Цена:</th>
+                <td><strong class="text-primary">{{ product.price }} руб.</strong></td>
+            </tr>
+            <tr>
+                <th>Категория:</th>
+                <td>{{ product.category.name }}</td>
+            </tr>
+            <tr>
+                <th>Владелец:</th>
+                <td>
+                    {% if product.owner %}
+                        {{ product.owner.email }}
+                    {% else %}
+                        <span class="text-muted">Не указан</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Дата добавления:</th>
+                <td>{{ product.created_at|date:"d.m.Y H:i" }}</td>
+            </tr>
+            <tr>
+                <th>Последнее обновление:</th>
+                <td>{{ product.updated_at|date:"d.m.Y H:i" }}</td>
+            </tr>
+        </table>
+
+        <div class="mt-4">
+            <a href="{% url 'catalog:home' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Вернуться к списку
+            </a>
+
+            {% if user.is_authenticated and user == product.owner or perms.catalog.can_unpublish_product %}
+            <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Редактировать
+            </a>
+            {% endif %}
+
+            {% if user.is_authenticated and user == product.owner or perms.catalog.can_delete_any_product %}
+            <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Удалить
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
