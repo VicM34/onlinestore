@@ -12,6 +12,24 @@
 </head>
 <body>
     <!-- Навигация -->
+    <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-grid"></i> Категории
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+        {% for category in categories %}
+        <li>
+            <a class="dropdown-item" href="{% url 'catalog:category_products' category.id %}">
+                {{ category.name }}
+                <span class="badge bg-secondary float-end">{{ category.products_count }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</li>
+
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="{% url 'catalog:home' %}">
