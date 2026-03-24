@@ -1,4 +1,5 @@
 from django.core.cache import cache
+from django.db.models import Count, Q
 from .models import Product, Category
 
 
@@ -35,7 +36,7 @@ def get_all_categories_with_products_count():
 
     if categories is None:
         categories = Category.objects.annotate(
-            products_count=models.Count('products', filter=models.Q(products__is_published=True))
+            products_count=Count('products', filter=Q(products__is_published=True))
         ).order_by('name')
         cache.set(cache_key, categories, 60 * 30)  # 30 минут
 

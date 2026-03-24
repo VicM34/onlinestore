@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
@@ -16,10 +17,9 @@ class HomeListView(ListView):
     model = Product
     template_name = 'catalog/home.html'
     context_object_name = 'products'
-    paginate_by = 12  # Пагинация для главной страницы
+    paginate_by = 12
 
     def get_queryset(self):
-        # Низкоуровневое кеширование для списка продуктов
         cache_key = 'home_products'
         products = cache.get(cache_key)
 
@@ -27,13 +27,12 @@ class HomeListView(ListView):
             products = Product.objects.filter(
                 is_published=True
             ).select_related('category', 'owner').order_by('-created_at')
-            cache.set(cache_key, products, 60 * 5)  # Кешируем на 5 минут
+            cache.set(cache_key, products, 60 * 5)
 
         return products
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Кеширование для последних 5 продуктов
         latest_key = 'latest_products'
         latest_products = cache.get(latest_key)
 
@@ -51,30 +50,23 @@ class ProductDetailView(DetailView):
     template_name = 'catalog/product_detail.html'
     context_object_name = 'product'
 
-    @method_decorator(cache_page(60 * 15))  # Кешировать на 15 минут
+    @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_headers('Cookie', 'Authorization'))
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
     def get_object(self, queryset=None):
-        # Используем низкоуровневое кеширование для объекта
         pk = self.kwargs.get('pk')
         cache_key = f'product_{pk}'
         product = cache.get(cache_key)
 
         if product is None:
             product = super().get_object(queryset)
-            cache.set(cache_key, product, 60 * 15)  # Кешируем на 15 минут
-            # Увеличиваем счетчик просмотров
-            product.views_count += 1
-            product.save()
-            # Обновляем кеш с новым счетчиком
             cache.set(cache_key, product, 60 * 15)
 
         return product
 
     def get_queryset(self):
-        # Показываем только опубликованные товары для всех
         return Product.objects.filter(is_published=True).order_by('-created_at')
 
 
@@ -87,11 +79,9 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     login_url = 'users:login'
 
     def form_valid(self, form):
-        # Автоматически назначаем владельца
         form.instance.owner = self.request.user
         messages.success(self.request, 'Продукт успешно создан!')
 
-        # Очищаем кеш после создания продукта
         cache.delete('home_products')
         cache.delete('latest_products')
 
@@ -107,17 +97,13 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     raise_exception = True
 
     def test_func(self):
-        """Проверка прав на редактирование"""
         product = self.get_object()
         user = self.request.user
-
-        # Редактировать может владелец или модератор (с правом can_unpublish_product)
         return user == product.owner or user.has_perm('catalog.can_unpublish_product')
 
     def get_success_url(self):
         messages.success(self.request, 'Продукт успешно обновлен!')
 
-        # Очищаем кеш после обновления
         cache.delete(f'product_{self.object.pk}')
         cache.delete('home_products')
         cache.delete('latest_products')
@@ -134,11 +120,8 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     raise_exception = True
 
     def test_func(self):
-        """Проверка прав на удаление"""
         product = self.get_object()
         user = self.request.user
-
-        # Удалять может владелец или модератор (с правом can_delete_any_product)
         return user == product.owner or user.has_perm('catalog.can_delete_any_product')
 
     def delete(self, request, *args, **kwargs):
@@ -194,6 +177,7 @@ class CategoryProductsView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         category_id = self.kwargs.get('category_id')
-        context['category'] = Category.objects.get(id=category_id)
+        # Исправлено: используем get_object_or_404
+        context['category'] = get_object_or_404(Category, id=category_id)
         context['categories'] = get_all_categories_with_products_count()
         return context
