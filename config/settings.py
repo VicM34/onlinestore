@@ -20,7 +20,6 @@ DEBUG = True if os.getenv('DEBUG', 'True') == 'True' else False
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -45,16 +44,19 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+# Шаблоны (один блок)
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'catalog.context_processors.categories_processor',  # Добавляем
             ],
         },
     },
@@ -64,22 +66,19 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# ИСПРАВЛЕНО: убрал '_psycopg2' и исправил default для PORT
 DATABASES = {
     "default": {
-        'ENGINE': 'django.db.backends.postgresql',  # Убрал _psycopg2
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DATABASE_NAME'),
         'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
         'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT', '5432'),  # Исправлен default
+        'PORT': os.getenv('DATABASE_PORT', '5432'),
     }
 }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -97,32 +96,20 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = os.getenv('LANGUAGE_CODE', 'ru-ru')
-
 TIME_ZONE = os.getenv('TIME_ZONE', 'Europe/Moscow')
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
+STATICFILES_DIRS = []
 
-# Дополнительные директории со статическими файлами
-STATICFILES_DIRS = [
-
-]
-
-# Медиа файлы (если нужно загружать изображения)
+# Media files
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Настройки для кастомной модели пользователя
@@ -130,15 +117,41 @@ AUTH_USER_MODEL = 'users.User'
 
 # Настройки для писем (для разработки)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# Для продакшена можно использовать:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # URL для аутентификации
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'catalog:home'
 LOGOUT_REDIRECT_URL = 'catalog:home'
+
+# ========== НАСТРОЙКИ КЕШИРОВАНИЯ ==========
+CACHE_ENABLED = os.getenv("CACHE_ENABLED", "True") == "True"
+
+if CACHE_ENABLED:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1"),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'PARSER_CLASS': 'redis.connection.HiredisParser',
+                'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+                'CONNECTION_POOL_CLASS_KWARGS': {
+                    'max_connections': 50,
+                    'timeout': 20,
+                },
+                'MAX_CONNECTIONS': 1000,
+                'PICKLE_VERSION': -1,
+            },
+            'KEY_PREFIX': 'onlinestore',
+            'TIMEOUT': 300,  # 5 минут по умолчанию
+        }
+    }
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_CACHE_ALIAS = 'default'
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }   
